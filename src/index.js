@@ -9,21 +9,26 @@ const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
 
 const search = event => {
-    const value = event.target.value.trim();
-
-    if (value.length > 0) {
-        fetchCountries(value)
-            .then(data => {
-                if (data.length > 10) {
-                    Notiflix.Notify.info(
-                        'Too many matches found. Please enter a more specific name.'
-                    );
-                } else {
-                    if (data.length === 1) {
-                        countryList.innerHTML = data
-                            .map(
-                                country =>
-                                `<li>
+  const value = event.target.value.trim();
+  if (value.length === 0) {
+    countryList.innerHTML = '';
+    countryInfo.innerHTML = '';
+  }
+  if (value.length > 0) {
+    fetchCountries(value)
+      .then(data => {
+        countryInfo.innerHTML = '';
+        if (data.length > 10) {
+          Notiflix.Notify.info(
+            'Too many matches found. Please enter a more specific name.'
+          );
+        } else {
+          if (data.length === 1) {
+            countryList.innerHTML = '';
+            countryInfo.innerHTML = data
+              .map(
+                country =>
+                  `<li>
                            <h1>
                           <img src="${country.flags.svg}"  width="30" />
                           ${country.name.common}</h1>
@@ -33,22 +38,23 @@ const search = event => {
                              country.languages
                            )}</p>
                            </li>`
-                            )
-                            .join('');
-                    } else {
-                        countryList.innerHTML = data
-                            .map(
-                                country =>
-                                `<li><img src="${country.flags.svg}"  width="30" /> ${country.name.common}</li>`
-                            )
-                            .join('');
-                    }
-                }
-            })
-            .catch(error => {
-                Notiflix.Notify.failure('Oops, there is no country with that name');
-            });
-    }
+              )
+              .join('');
+          } else {
+            countryList.innerHTML = data
+              .map(
+                country =>
+                  `<li><img src="${country.flags.svg}"  width="30" /> ${country.name.common}</li>`
+              )
+              .join('');
+          }
+        }
+      })
+      .catch(error => {
+        countryInfo.innerHTML = '';
+        Notiflix.Notify.failure('Oops, there is no country with that name');
+      });
+  }
 };
 
 searchInput.addEventListener('input', debounce(search, DEBOUNCE_DELAY));
